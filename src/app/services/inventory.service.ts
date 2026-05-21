@@ -30,7 +30,7 @@ export class InventoryService {
   // URL base de la API del backend.
   // En desarrollo: http://localhost:3000/api/inventario
   // En producción: cambiar a la URL del servidor desplegado
-  private apiUrl = 'http://localhost:3000/api/inventario';
+  private apiUrl = 'https://mean-get-backend-production-5661.up.railway.app/api/inventario';
 
   // Inyectamos HttpClient para hacer peticiones HTTP
   private http = inject(HttpClient);
