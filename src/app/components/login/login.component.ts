@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   private authService = inject(AuthService);
   private router      = inject(Router);
@@ -24,6 +24,17 @@ export class LoginComponent {
   errorMessage = '';
   isLoading    = false;
   showPass     = false;
+
+  async ngOnInit(): Promise<void> {
+    try {
+      const result = await this.authService.checkRedirectResult();
+      if (result?.user) {
+        this.router.navigate(['/dashboard']);
+      }
+    } catch {
+      // no redirect result, normal flow
+    }
+  }
 
   showLogin(): void {
     this.mode         = 'login';
@@ -51,9 +62,8 @@ export class LoginComponent {
       await this.authService.loginWithGoogle();
       this.router.navigate(['/dashboard']);
     } catch (error: any) {
-      console.error('Firebase Google error:', error?.code, error?.message, error);
-      this.errorMessage = 'No se pudo completar el inicio de sesión con Google. Intenta de nuevo. (Código: ' + (error?.code ?? 'desconocido') + ')';
-    } finally {
+      console.error('Firebase Google error:', error?.code, error);
+      this.errorMessage = 'No se pudo completar el inicio de sesión con Google. Intenta de nuevo.';
       this.isLoading = false;
     }
   }

@@ -3,7 +3,8 @@ import {
   Auth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
@@ -31,7 +32,11 @@ export class AuthService {
 
   loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(this.auth, provider);
+    return signInWithRedirect(this.auth, provider);
+  }
+
+  checkRedirectResult() {
+    return getRedirectResult(this.auth);
   }
 
   resetPassword(email: string) {
