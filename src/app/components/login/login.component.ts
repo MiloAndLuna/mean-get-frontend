@@ -1,7 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
+import { User } from 'firebase/auth';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -10,10 +13,11 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
   private router      = inject(Router);
+  private authSub?: Subscription;
 
   mode: 'login' | 'register' | 'recovery' | 'recovery-sent' = 'login';
 
@@ -25,15 +29,24 @@ export class LoginComponent implements OnInit {
   isLoading    = false;
   showPass     = false;
 
-  async ngOnInit(): Promise<void> {
-    try {
-      const result = await this.authService.checkRedirectResult();
-      if (result?.user) {
-        this.router.navigate(['/dashboard']);
-      }
-    } catch {
-      // no redirect result, normal flow
-    }
+  ngOnInit(): void {
+    // Escucha cambios de auth — si Firebase detecta usuario (por redirect o sesión previa)
+    // navega al dashboard automáticamente
+    this.authSub = this.authService.user$.pipe(
+      filter((u): u is User => u !== null),
+      take(1)
+    ).subscribe(() => {
+      this.router.navigate(['/dashboard']);
+    });
+
+    // Procesa explícitamente el resultado del redirect de Google
+    this.authService.checkRedirectResult().catch(err =>
+      console.error('checkRedirectResult error:', err)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
   }
 
   showLogin(): void {
