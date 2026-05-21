@@ -1,0 +1,145 @@
+<!-- ============================================================
+  ARCHIVO: charts.component.html
+  PROPÓSITO: Template del componente de gráficas estadísticas.
+  Muestra: métricas extra + gráfica de barras + gráfica de dona.
+  Usa ng2-charts con la directiva <canvas baseChart>.
+  ============================================================ -->
+
+<div class="row g-4">
+
+  <!-- ════════════════════════════════════════════
+    FILA 1: MÉTRICAS EXTRA EN MINI-TARJETAS
+    Complementan los KPI del dashboard con datos de stock
+    ════════════════════════════════════════════ -->
+  <div class="col-12">
+    <div class="row g-3">
+
+      <!-- Métrica: Producto con mayor rotación -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="border rounded p-3 bg-light h-100">
+          <p class="small text-muted mb-1 fw-semibold text-uppercase">
+            <i class="bi bi-trophy-fill text-warning me-1"></i>
+            Mayor Rotación
+          </p>
+          @if (productoMayorRotacion) {
+            <!-- Nombre del producto más vendido/salido -->
+            <p class="fw-bold mb-0 text-truncate">{{ productoMayorRotacion.producto }}</p>
+            <small class="text-success">{{ productoMayorRotacion.salidas }} salidas</small>
+          } @else {
+            <p class="mb-0 text-muted">Sin datos</p>
+          }
+        </div>
+      </div>
+
+      <!-- Métrica: Productos en estado Crítico -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="border rounded p-3 h-100" [class.border-warning]="productosCriticos > 0">
+          <p class="small text-muted mb-1 fw-semibold text-uppercase">
+            <i class="bi bi-exclamation-circle-fill text-warning me-1"></i>
+            Productos Críticos
+          </p>
+          <h3 class="fw-bold mb-0" [class.text-warning]="productosCriticos > 0">
+            {{ productosCriticos }}
+          </h3>
+        </div>
+      </div>
+
+      <!-- Métrica: Productos Agotados -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="border rounded p-3 h-100" [class.border-danger]="productosAgotados > 0">
+          <p class="small text-muted mb-1 fw-semibold text-uppercase">
+            <i class="bi bi-x-circle-fill text-danger me-1"></i>
+            Productos Agotados
+          </p>
+          <h3 class="fw-bold mb-0" [class.text-danger]="productosAgotados > 0">
+            {{ productosAgotados }}
+          </h3>
+        </div>
+      </div>
+
+      <!-- Métrica: Stock Total -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="border rounded p-3 bg-light h-100">
+          <p class="small text-muted mb-1 fw-semibold text-uppercase">
+            <i class="bi bi-stack text-primary me-1"></i>
+            Stock Total
+          </p>
+          <h3 class="fw-bold mb-0 text-primary">{{ stockTotal }}</h3>
+          <small class="text-muted">unidades totales</small>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+    FILA 2: GRÁFICA DE BARRAS
+    Stock final por producto
+    ════════════════════════════════════════════ -->
+  <div class="col-12 col-lg-7">
+    <div class="border rounded p-3 h-100">
+      <h6 class="fw-bold mb-3 text-dark">
+        <i class="bi bi-bar-chart-fill me-2 text-primary"></i>
+        Stock Final por Producto
+        <small class="text-muted fw-normal">(máx. 10 productos)</small>
+      </h6>
+
+      <!-- Contenedor con altura fija para la gráfica
+           chart-container: clase CSS de styles.css con height: 300px -->
+      <div class="chart-container">
+        <!-- baseChart: directiva de ng2-charts que renderiza Chart.js
+             [data]: datos de la gráfica (barChartData del componente)
+             [options]: opciones de configuración (barChartOptions)
+             [type]: tipo de gráfica ('bar', 'line', 'pie', etc.) -->
+        <canvas
+          baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="'bar'"
+        ></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+    FILA 2: GRÁFICA DE DONA (DOUGHNUT)
+    Distribución porcentual de estados
+    ════════════════════════════════════════════ -->
+  <div class="col-12 col-lg-5">
+    <div class="border rounded p-3 h-100">
+      <h6 class="fw-bold mb-3 text-dark">
+        <i class="bi bi-pie-chart-fill me-2 text-primary"></i>
+        Distribución por Estado
+      </h6>
+
+      <!-- Contenedor de la gráfica circular -->
+      <div class="chart-container">
+        <!-- Gráfica de dona: [type]="'doughnut'" -->
+        <canvas
+          baseChart
+          [data]="doughnutChartData"
+          [options]="doughnutChartOptions"
+          [type]="'doughnut'"
+        ></canvas>
+      </div>
+
+      <!-- Leyenda manual con colores y porcentajes debajo de la gráfica -->
+      <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="rounded-circle d-inline-block" style="width:12px;height:12px;background:#198754;"></span>
+          Normal
+        </span>
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="rounded-circle d-inline-block" style="width:12px;height:12px;background:#ffc107;"></span>
+          Crítico
+        </span>
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="rounded-circle d-inline-block" style="width:12px;height:12px;background:#dc3545;"></span>
+          Agotado
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+</div>

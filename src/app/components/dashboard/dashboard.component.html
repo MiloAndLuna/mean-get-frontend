@@ -1,0 +1,207 @@
+<!-- ============================================================
+  ARCHIVO: dashboard.component.html
+  PROPÓSITO: Template del dashboard principal.
+  Muestra: barra de navegación, tarjetas KPI, componente CRUD
+  y componente de gráficas. Todo con Bootstrap 5.
+  ============================================================ -->
+
+<!-- ════════════════════════════════════════════
+  BARRA DE NAVEGACIÓN
+  navbar-dark bg-primary: barra azul con texto blanco
+  ════════════════════════════════════════════ -->
+<nav class="navbar navbar-dark navbar-app">
+  <div class="container-fluid px-4">
+
+    <!-- Marca / Logo de la app -->
+    <span class="navbar-brand d-flex align-items-center gap-2">
+      <i class="bi bi-box-seam-fill"></i>
+      Gestión Inteligente de Inventario
+    </span>
+
+    <!-- Información del usuario y botón de logout -->
+    <div class="d-flex align-items-center gap-3">
+
+      <!-- Solo mostramos la info del usuario si está autenticado -->
+      @if (currentUser) {
+        <!-- Foto de perfil de Google (si existe) -->
+        @if (currentUser.photoURL) {
+          <img
+            [src]="currentUser.photoURL"
+            alt="Foto de perfil"
+            class="rounded-circle border border-2 border-white"
+            width="36"
+            height="36"
+          />
+        }
+        <!-- Nombre del usuario obtenido de Firebase -->
+        <span class="text-white fw-semibold d-none d-sm-block">
+          {{ currentUser.displayName }}
+        </span>
+      }
+
+      <!-- Botón de cerrar sesión -->
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-1"></i>
+        Salir
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════
+  CONTENIDO PRINCIPAL
+  ════════════════════════════════════════════ -->
+<div class="container-fluid px-4 py-4">
+
+  <!-- SPINNER DE CARGA
+       Solo se muestra mientras se cargan los datos del inventario -->
+  @if (isLoading) {
+    <div class="d-flex justify-content-center align-items-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <span class="ms-3 text-muted">Cargando inventario...</span>
+    </div>
+  } @else {
+
+    <!-- ────────────────────────────────────────
+      SECCIÓN DE BIENVENIDA Y DATOS DEL USUARIO
+    ──────────────────────────────────────── -->
+    @if (currentUser) {
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <!-- Saludo personalizado con el nombre del usuario -->
+          <h4 class="mb-1 fw-bold text-dark">
+            Hola, {{ currentUser.displayName?.split(' ')?.[0] }} 👋
+          </h4>
+          <!-- Correo del usuario -->
+          <p class="text-muted mb-0 small">
+            <i class="bi bi-envelope me-1"></i>{{ currentUser.email }}
+          </p>
+        </div>
+        <!-- Badge de alerta si hay productos en riesgo -->
+        @if (productosEnRiesgo > 0) {
+          <div class="badge bg-danger fs-6 px-3 py-2">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ productosEnRiesgo }} producto(s) en riesgo
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ────────────────────────────────────────
+      TARJETAS KPI (Indicadores Clave de Rendimiento)
+      Muestran métricas resumen del inventario
+    ──────────────────────────────────────── -->
+    <div class="row g-3 mb-4">
+
+      <!-- KPI 1: Total de registros -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center gap-3 p-4">
+            <div class="kpi-bg-purple">
+              <i class="bi bi-archive-fill kpi-icon" style="color: var(--color-primary);"></i>
+            </div>
+            <div>
+              <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size:0.72rem; letter-spacing:0.8px;">Total Productos</p>
+              <h3 class="mb-0 fw-bold" style="color: var(--color-primary);">{{ totalRegistros }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 2: Última actualización -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center gap-3 p-4">
+            <div class="kpi-bg-blue">
+              <i class="bi bi-calendar-check-fill kpi-icon" style="color: var(--color-secondary);"></i>
+            </div>
+            <div>
+              <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size:0.72rem; letter-spacing:0.8px;">Última Actualización</p>
+              <h6 class="mb-0 fw-bold">{{ ultimaActualizacion }}</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Producto con mayor rotación -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center gap-3 p-4">
+            <div class="kpi-bg-amber">
+              <i class="bi bi-graph-up-arrow kpi-icon" style="color: var(--color-accent);"></i>
+            </div>
+            <div>
+              <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size:0.72rem; letter-spacing:0.8px;">Mayor Rotación</p>
+              <h6 class="mb-0 fw-bold text-truncate" style="max-width: 150px;">
+                {{ productoMayorRotacion }}
+              </h6>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 4: Productos en riesgo (Crítico + Agotado) -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center gap-3 p-4">
+            <div class="kpi-bg-red">
+              <i class="bi bi-exclamation-triangle-fill kpi-icon" style="color: var(--color-agotado);"></i>
+            </div>
+            <div>
+              <p class="text-muted small mb-1 text-uppercase fw-semibold" style="font-size:0.72rem; letter-spacing:0.8px;">En Riesgo</p>
+              <h3 class="mb-0 fw-bold" style="color: var(--color-agotado);">{{ productosEnRiesgo }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Fin tarjetas KPI -->
+
+    <!-- ────────────────────────────────────────
+      COMPONENTE CRUD DE INVENTARIO
+      Pasa el usuario y los items como @Input,
+      escucha el evento inventarioChanged como @Output.
+    ──────────────────────────────────────── -->
+    <!-- Tarjeta del CRUD: el header lo gestiona el propio componente hijo -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body p-0">
+        <!-- app-inventory-crud:
+             [currentUser]: pasa el usuario al componente hijo
+             [items]: pasa el array de productos al hijo
+             (inventarioChanged): evento que dispara el hijo cuando hay cambios -->
+        <app-inventory-crud
+          [currentUser]="currentUser"
+          [items]="items"
+          (inventarioChanged)="onInventarioChanged()"
+        ></app-inventory-crud>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────
+      COMPONENTE DE GRÁFICAS ESTADÍSTICAS
+      Solo se muestra si hay datos en el inventario
+    ──────────────────────────────────────── -->
+    @if (items.length > 0) {
+      <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0 fw-bold">
+            <i class="bi bi-bar-chart-fill me-2 text-primary"></i>
+            Estadísticas del Inventario
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- app-charts: recibe los items para generar las gráficas -->
+          <app-charts [items]="items"></app-charts>
+        </div>
+      </div>
+    }
+
+  }
+  <!-- Fin @else (datos cargados) -->
+
+</div>
+<!-- Fin container principal -->

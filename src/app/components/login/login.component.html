@@ -1,0 +1,417 @@
+<!-- ============================================================
+  ARCHIVO: login.component.html
+  VISTAS controladas por `mode`:
+    'login'         → email/pass + Google SSO
+    'register'      → crear cuenta nueva
+    'recovery'      → enviar enlace de recuperación
+    'recovery-sent' → confirmación de envío
+  ============================================================ -->
+
+<div class="login-page">
+
+  <!-- ════════════════════════════════════════════
+    PANEL IZQUIERDO — Gradiente animado
+    Visible solo en ≥ lg (992 px)
+    ════════════════════════════════════════════ -->
+  <div class="login-left">
+
+    <svg width="90" height="90" viewBox="0 0 90 90" fill="none"
+         xmlns="http://www.w3.org/2000/svg"
+         style="margin-bottom:32px; filter:drop-shadow(0 8px 24px rgba(0,0,0,0.25));">
+      <defs>
+        <linearGradient id="lgBg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stop-color="rgba(255,255,255,0.30)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0.10)"/>
+        </linearGradient>
+        <linearGradient id="lgBar" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%"   stop-color="rgba(255,255,255,0.50)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0.95)"/>
+        </linearGradient>
+      </defs>
+      <rect width="90" height="90" rx="24" fill="url(#lgBg)"
+            stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+      <rect x="14" y="56" width="13" height="22" rx="4" fill="url(#lgBar)" opacity="0.5"/>
+      <rect x="32" y="43" width="13" height="35" rx="4" fill="url(#lgBar)" opacity="0.7"/>
+      <rect x="50" y="30" width="13" height="48" rx="4" fill="url(#lgBar)" opacity="0.85"/>
+      <rect x="68" y="19" width="10" height="59" rx="4" fill="url(#lgBar)"/>
+      <polyline points="20,56 38,43 56,30 73,19"
+                stroke="#FCD34D" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="73" cy="19" r="5"  fill="#FCD34D"/>
+      <circle cx="73" cy="19" r="9"  fill="rgba(252,211,77,0.25)"/>
+    </svg>
+
+    <p class="login-tagline">Gestión Inteligente<br>de Inventario</p>
+    <p class="login-tagline-sub">
+      Controla tu stock en tiempo real,<br>toma decisiones con datos.
+    </p>
+
+    <div class="login-feature">
+      <div class="login-feature-icon">
+        <i class="bi bi-graph-up-arrow text-warning"></i>
+      </div>
+      <div>
+        <div style="font-weight:600;">Métricas en tiempo real</div>
+        <div style="font-size:0.82rem;opacity:0.7;">KPIs, gráficas y alertas automáticas</div>
+      </div>
+    </div>
+    <div class="login-feature">
+      <div class="login-feature-icon">
+        <i class="bi bi-shield-lock-fill text-warning"></i>
+      </div>
+      <div>
+        <div style="font-weight:600;">Datos seguros y privados</div>
+        <div style="font-size:0.82rem;opacity:0.7;">Firebase Auth + Google OAuth 2.0</div>
+      </div>
+    </div>
+    <div class="login-feature">
+      <div class="login-feature-icon">
+        <i class="bi bi-lightning-charge-fill text-warning"></i>
+      </div>
+      <div>
+        <div style="font-weight:600;">Gestión ágil del stock</div>
+        <div style="font-size:0.82rem;opacity:0.7;">Entradas, salidas y estados automáticos</div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+    PANEL DERECHO — Tarjeta de autenticación
+    ════════════════════════════════════════════ -->
+  <div class="login-right">
+    <div class="login-card">
+
+      <!-- Logo compacto SVG -->
+      <div class="text-center mb-3">
+        <svg width="56" height="56" viewBox="0 0 64 64" fill="none"
+             xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px;">
+          <defs>
+            <linearGradient id="cBg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stop-color="#6D28D9"/>
+              <stop offset="100%" stop-color="#2563EB"/>
+            </linearGradient>
+            <linearGradient id="cBar" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%"   stop-color="rgba(255,255,255,0.5)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,0.95)"/>
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="18" fill="url(#cBg)"/>
+          <rect x="10" y="40" width="9"  height="16" rx="3" fill="url(#cBar)" opacity="0.5"/>
+          <rect x="23" y="30" width="9"  height="26" rx="3" fill="url(#cBar)" opacity="0.75"/>
+          <rect x="36" y="20" width="9"  height="36" rx="3" fill="url(#cBar)" opacity="0.9"/>
+          <rect x="49" y="13" width="7"  height="43" rx="3" fill="url(#cBar)"/>
+          <polyline points="14,40 27,30 40,20 52,13"
+                    stroke="#FCD34D" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="52" cy="13" r="3.5" fill="#FCD34D"/>
+        </svg>
+      </div>
+
+
+      <!-- ══════════════════════════════════════
+        VISTA: LOGIN (email/pass + Google)
+        ══════════════════════════════════════ -->
+      @if (mode === 'login') {
+
+        <h3 class="fw-bold mb-1 login-title text-center" style="color:var(--color-text);">
+          ¡Bienvenido de nuevo!
+        </h3>
+        <p class="login-subtitle text-center mb-4" style="color:var(--color-muted);font-size:0.9rem;">
+          Inicia sesión en tu inventario
+        </p>
+
+        @if (errorMessage) {
+          <div class="alert py-2 px-3 small mb-3 d-flex align-items-center gap-2"
+               style="border-radius:10px;border:none;background:rgba(220,38,38,0.1);color:#B91C1C;">
+            <i class="bi bi-exclamation-circle-fill"></i> {{ errorMessage }}
+          </div>
+        }
+
+        <form (ngSubmit)="onSubmitEmail()" #f="ngForm">
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label" for="email">Correo electrónico</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-envelope text-muted"></i>
+              </span>
+              <input type="email" id="email" name="email"
+                     class="form-control border-start-0 ps-0"
+                     placeholder="tu&#64;correo.com"
+                     [(ngModel)]="email" required/>
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="mb-1">
+            <label class="form-label" for="pass">Contraseña</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-lock text-muted"></i>
+              </span>
+              <input [type]="showPass ? 'text' : 'password'"
+                     id="pass" name="pass"
+                     class="form-control border-start-0 border-end-0 ps-0"
+                     placeholder="••••••••"
+                     [(ngModel)]="pass" required minlength="6"/>
+              <button type="button" class="btn btn-outline-secondary border-start-0"
+                      (click)="showPass = !showPass" tabindex="-1"
+                      style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+                <i class="bi" [class.bi-eye]="!showPass" [class.bi-eye-slash]="showPass"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Enlace olvidé contraseña -->
+          <div class="text-end mb-3">
+            <button type="button" class="btn btn-link p-0"
+                    style="font-size:0.82rem;color:var(--color-primary);text-decoration:none;"
+                    (click)="showRecovery()">
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+
+          <!-- Botón Entrar -->
+          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-3"
+                  style="font-size:0.975rem;" [disabled]="isLoading || !f.form.valid">
+            @if (isLoading) {
+              <span class="spinner-border spinner-border-sm me-2"></span>Entrando…
+            } @else {
+              <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+            }
+          </button>
+
+        </form>
+
+        <!-- Divisor -->
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div style="flex:1;height:1px;background:var(--color-border);"></div>
+          <span style="font-size:0.8rem;color:var(--color-muted);">o continúa con</span>
+          <div style="flex:1;height:1px;background:var(--color-border);"></div>
+        </div>
+
+        <!-- Botón Google -->
+        <button class="btn-google mb-3" type="button" (click)="loginGoogle()" [disabled]="isLoading">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Continuar con Google</span>
+        </button>
+
+        <!-- Enlace a registro -->
+        <p class="text-center mb-0" style="font-size:0.88rem;color:var(--color-muted);">
+          ¿No tienes cuenta?
+          <button type="button" class="btn btn-link p-0 ms-1"
+                  style="font-size:0.88rem;font-weight:600;color:var(--color-primary);text-decoration:none;"
+                  (click)="showRegister()">
+            Regístrate gratis
+          </button>
+        </p>
+
+      }
+
+
+      <!-- ══════════════════════════════════════
+        VISTA: REGISTRO (crear cuenta nueva)
+        ══════════════════════════════════════ -->
+      @if (mode === 'register') {
+
+        <!-- Volver -->
+        <button type="button" class="btn btn-link p-0 mb-3 d-flex align-items-center gap-1"
+                style="font-size:0.85rem;color:var(--color-muted);text-decoration:none;"
+                (click)="showLogin()">
+          <i class="bi bi-arrow-left"></i> Volver
+        </button>
+
+        <h3 class="fw-bold mb-1 login-title text-center" style="color:var(--color-text);">
+          Crear cuenta
+        </h3>
+        <p class="login-subtitle text-center mb-4" style="color:var(--color-muted);font-size:0.9rem;">
+          Regístrate y empieza a gestionar tu inventario
+        </p>
+
+        @if (errorMessage) {
+          <div class="alert py-2 px-3 small mb-3 d-flex align-items-center gap-2"
+               style="border-radius:10px;border:none;background:rgba(220,38,38,0.1);color:#B91C1C;">
+            <i class="bi bi-exclamation-circle-fill"></i> {{ errorMessage }}
+          </div>
+        }
+
+        <form (ngSubmit)="onSubmitEmail()" #rf="ngForm">
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label" for="regEmail">Correo electrónico</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-envelope text-muted"></i>
+              </span>
+              <input type="email" id="regEmail" name="email"
+                     class="form-control border-start-0 ps-0"
+                     placeholder="tu&#64;correo.com"
+                     [(ngModel)]="email" required/>
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="mb-4">
+            <label class="form-label" for="regPass">Contraseña</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-lock text-muted"></i>
+              </span>
+              <input [type]="showPass ? 'text' : 'password'"
+                     id="regPass" name="pass"
+                     class="form-control border-start-0 border-end-0 ps-0"
+                     placeholder="Mínimo 6 caracteres"
+                     [(ngModel)]="pass" required minlength="6"/>
+              <button type="button" class="btn btn-outline-secondary border-start-0"
+                      (click)="showPass = !showPass" tabindex="-1"
+                      style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+                <i class="bi" [class.bi-eye]="!showPass" [class.bi-eye-slash]="showPass"></i>
+              </button>
+            </div>
+            <div class="form-text" style="font-size:0.78rem;">
+              <i class="bi bi-info-circle me-1"></i>Mínimo 6 caracteres.
+            </div>
+          </div>
+
+          <!-- Botón Registrar -->
+          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-3"
+                  style="font-size:0.975rem;" [disabled]="isLoading || !rf.form.valid">
+            @if (isLoading) {
+              <span class="spinner-border spinner-border-sm me-2"></span>Creando cuenta…
+            } @else {
+              <i class="bi bi-person-plus-fill me-2"></i>Crear cuenta
+            }
+          </button>
+
+        </form>
+
+        <!-- Divisor -->
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div style="flex:1;height:1px;background:var(--color-border);"></div>
+          <span style="font-size:0.8rem;color:var(--color-muted);">o regístrate con</span>
+          <div style="flex:1;height:1px;background:var(--color-border);"></div>
+        </div>
+
+        <!-- Botón Google -->
+        <button class="btn-google mb-3" type="button" (click)="loginGoogle()" [disabled]="isLoading">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Continuar con Google</span>
+        </button>
+
+        <!-- Enlace a login -->
+        <p class="text-center mb-0" style="font-size:0.88rem;color:var(--color-muted);">
+          ¿Ya tienes cuenta?
+          <button type="button" class="btn btn-link p-0 ms-1"
+                  style="font-size:0.88rem;font-weight:600;color:var(--color-primary);text-decoration:none;"
+                  (click)="showLogin()">
+            Inicia sesión
+          </button>
+        </p>
+
+      }
+
+
+      <!-- ══════════════════════════════════════
+        VISTA: RECUPERAR CONTRASEÑA
+        ══════════════════════════════════════ -->
+      @if (mode === 'recovery') {
+
+        <button type="button" class="btn btn-link p-0 mb-3 d-flex align-items-center gap-1"
+                style="font-size:0.85rem;color:var(--color-muted);text-decoration:none;"
+                (click)="showLogin()">
+          <i class="bi bi-arrow-left"></i> Volver
+        </button>
+
+        <div class="text-center mb-4">
+          <div style="width:56px;height:56px;background:rgba(109,40,217,0.10);border-radius:16px;
+                      display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;">
+            <i class="bi bi-envelope-at-fill" style="font-size:1.5rem;color:var(--color-primary);"></i>
+          </div>
+          <h4 class="fw-bold login-title mb-1" style="color:var(--color-text);">
+            Recuperar contraseña
+          </h4>
+          <p style="font-size:0.88rem;color:var(--color-muted);margin:0;">
+            Te enviaremos un enlace para restablecer tu contraseña.
+          </p>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert py-2 px-3 small mb-3 d-flex align-items-center gap-2"
+               style="border-radius:10px;border:none;background:rgba(220,38,38,0.1);color:#B91C1C;">
+            <i class="bi bi-exclamation-circle-fill"></i> {{ errorMessage }}
+          </div>
+        }
+
+        <div class="mb-4">
+          <label class="form-label" for="recEmail">Correo electrónico</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-envelope text-muted"></i>
+            </span>
+            <input type="email" id="recEmail" name="recEmail"
+                   class="form-control border-start-0 ps-0"
+                   placeholder="tu&#64;correo.com"
+                   [(ngModel)]="recoveryEmail"/>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary w-100 py-3 fw-bold"
+                style="font-size:0.975rem;" (click)="sendRecovery()" [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="spinner-border spinner-border-sm me-2"></span>Enviando…
+          } @else {
+            <i class="bi bi-send-fill me-2"></i>Enviar enlace de recuperación
+          }
+        </button>
+
+        <p class="text-center mt-3 mb-0" style="font-size:0.78rem;color:var(--color-muted);">
+          <i class="bi bi-info-circle me-1"></i>Revisa también tu carpeta de spam.
+        </p>
+
+      }
+
+
+      <!-- ══════════════════════════════════════
+        VISTA: CONFIRMACIÓN DE ENVÍO
+        ══════════════════════════════════════ -->
+      @if (mode === 'recovery-sent') {
+
+        <div class="text-center">
+          <div style="width:72px;height:72px;background:rgba(5,150,105,0.10);border-radius:50%;
+                      display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <i class="bi bi-check-circle-fill" style="font-size:2.2rem;color:var(--color-normal);"></i>
+          </div>
+          <h4 class="fw-bold login-title mb-2" style="color:var(--color-text);">¡Correo enviado!</h4>
+          <p style="font-size:0.92rem;color:var(--color-muted);line-height:1.6;margin-bottom:8px;">
+            Si <strong>{{ recoveryEmail }}</strong> está registrado, recibirás
+            un enlace para restablecer tu contraseña.
+          </p>
+          <p style="font-size:0.82rem;color:var(--color-muted);margin-bottom:32px;">
+            Revisa la carpeta de <strong>spam</strong> si no aparece en tu bandeja.
+          </p>
+          <button type="button" class="btn btn-primary w-100 py-3 fw-bold"
+                  style="font-size:0.975rem;" (click)="showLogin()">
+            <i class="bi bi-arrow-left me-2"></i>Volver al inicio de sesión
+          </button>
+        </div>
+
+      }
+
+    </div>
+  </div>
+
+</div>
