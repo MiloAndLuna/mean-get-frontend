@@ -51,7 +51,8 @@ export class LoginComponent {
       await this.authService.loginWithGoogle();
       this.router.navigate(['/dashboard']);
     } catch (error: any) {
-      this.errorMessage = 'No se pudo completar el inicio de sesión con Google. Intenta de nuevo.';
+      console.error('Firebase Google error:', error?.code, error?.message, error);
+      this.errorMessage = 'No se pudo completar el inicio de sesión con Google. Intenta de nuevo. (Código: ' + (error?.code ?? 'desconocido') + ')';
     } finally {
       this.isLoading = false;
     }
